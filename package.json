@@ -45,6 +45,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@vercel/speed-insights": "^1.0.11",
     "chart.js": "^4.4.3",
     "highlight.js": "11.9.0",
     "svelte-focus-trap": "^1.2.0"

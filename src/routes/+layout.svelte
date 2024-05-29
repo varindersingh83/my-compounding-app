@@ -16,6 +16,10 @@
 	hljs.registerLanguage('javascript', javascript);
 	hljs.registerLanguage('typescript', typescript);
 	storeHighlightJs.set(hljs);
+
+	// Speed Insights
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+	injectSpeedInsights();
 </script>
 
 <!-- App Shell -->
