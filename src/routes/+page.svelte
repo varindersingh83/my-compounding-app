@@ -11,31 +11,39 @@
   
 	let initialDeposit: string = '';
 	let annualContribution: string = '';
-	let yearsOfGrowth: number = 0;
-	let rateOfReturn: number = 0;
+	let yearsOfGrowth: number | null = null;
+	let rateOfReturn: number | null = null;
   
 	let contributions: Contribution[] = [];
 	let totalContributionAmount: number = 0;
 	let totalAmount: number = 0;
 	let isFocused: boolean = true;
+	let activeTab: 'graph' | 'table' = 'graph';
   
 	function calculate() {
 	  const initialDepositNum = parseFloat(initialDeposit.replace(/[^0-9.-]+/g, '')) || 0;
 	  const annualContributionNum = parseFloat(annualContribution.replace(/[^0-9.-]+/g, '')) || 0;
+	  const yearsNum = yearsOfGrowth || 0;
+	  const rateNum = rateOfReturn || 0;
 	  
 	  contributions = calculateCompoundInterest(
 		initialDepositNum,
 		annualContributionNum,
-		yearsOfGrowth,
-		rateOfReturn
+		yearsNum,
+		rateNum
 	  );
   
-	  totalContributionAmount = initialDepositNum + annualContributionNum * yearsOfGrowth;
+	  totalContributionAmount = initialDepositNum + annualContributionNum * yearsNum;
 	  totalAmount = contributions.length ? contributions[contributions.length - 1].total : 0;
 	}
   
 	function formatCurrency(value: number): string {
-	  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+	  return new Intl.NumberFormat('en-US', { 
+		style: 'currency', 
+		currency: 'USD',
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0
+	  }).format(value);
 	}
   
 	function handleBlur(event: Event) {
@@ -50,6 +58,52 @@
 	  const target = event.target as HTMLInputElement;
 	  target.value = target.value.replace(/[^0-9.-]+/g, '');
 	}
+
+	function handleInput(event: Event) {
+		const target = event.target as HTMLInputElement;
+		let value = target.value.replace(/[^0-9.-]+/g, '');
+		
+		// If the value is empty, just return
+		if (!value) {
+			initialDeposit = '';
+			return;
+		}
+
+		// Convert to number and format
+		const numValue = parseFloat(value);
+		if (!isNaN(numValue)) {
+			const formattedValue = formatCurrency(numValue);
+			target.value = formattedValue;
+			initialDeposit = formattedValue;
+		}
+	}
+
+	function handleAnnualInput(event: Event) {
+		const target = event.target as HTMLInputElement;
+		let value = target.value.replace(/[^0-9.-]+/g, '');
+		
+		// If the value is empty, just return
+		if (!value) {
+			annualContribution = '';
+			return;
+		}
+
+		// Convert to number and format
+		const numValue = parseFloat(value);
+		if (!isNaN(numValue)) {
+			const formattedValue = formatCurrency(numValue);
+			target.value = formattedValue;
+			annualContribution = formattedValue;
+		}
+	}
+
+	function handleYearsInput(event: Event) {
+		const target = event.target as HTMLInputElement;
+		let value = target.value.replace(/^0+/, ''); // Remove leading zeros
+		if (value === '') value = '0'; // If empty, set to 0
+		target.value = value;
+		yearsOfGrowth = parseInt(value) || 0;
+	}
 </script>
 
 <style>
@@ -58,7 +112,7 @@
 	  flex-direction: column;
 	  justify-content: center;
 	  align-items: center;
-	  height: 100vh;
+	  /* height: 100vh; */
 	  text-align: center;
 	  margin: auto;
 	  padding: 0 20px;
@@ -111,6 +165,45 @@
 	    flex-direction: column; /* Stack vertically on smaller screens */
 	  }
 	}
+
+	.tabs {
+		display: flex;
+		gap: 1rem;
+		margin-bottom: 1rem;
+	}
+
+	.tab {
+		padding: 0.5rem 1rem;
+		border: 1px solid #ccc;
+		border-radius: 0.25rem;
+		cursor: pointer;
+		background: none;
+	}
+
+	.tab.active {
+		background: #4a5568;
+		color: white;
+	}
+
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	th {
+		background-color: #4a5568;
+		color: white;
+		text-align: left;
+	}
+
+	td, th {
+		border: 1px solid #e2e8f0;
+	}
+
+	.table-scroll-container {
+		max-height: 400px;
+		overflow-y: auto;
+	}
 </style>
   
 <div class="container">
@@ -126,6 +219,7 @@
 			type="text" 
 			bind:value={initialDeposit} 
 			placeholder="$0.00" 
+			on:input={handleInput}
 			on:blur={handleBlur} 
 			on:focus={handleFocus} 
 		  />
@@ -137,6 +231,7 @@
 			type="text" 
 			bind:value={annualContribution} 
 			placeholder="$0.00" 
+			on:input={handleAnnualInput}
 			on:blur={handleBlur} 
 			on:focus={handleFocus} 
 		  />
@@ -147,7 +242,8 @@
 			class="input" 
 			type="number" 
 			bind:value={yearsOfGrowth} 
-			placeholder="Years" 
+			placeholder="0" 
+			on:input={handleYearsInput}
 		  />
 		</label>
 		<label class="label">
@@ -157,7 +253,7 @@
 			type="number" 
 			step="0.01" 
 			bind:value={rateOfReturn} 
-			placeholder="0.00%" 
+			placeholder="0.0" 
 		  />
 		</label>
 		<p>Rate of Return since inception 1986</p>
@@ -177,7 +273,46 @@
 		  <span>Total</span>
 		  <span>{formatCurrency(totalAmount)}</span>
 		</div>
-		<Chart {contributions} />
+
+		<div class="tabs mt-4">
+			<button 
+				class="tab {activeTab === 'graph' ? 'active' : ''}" 
+				on:click={() => activeTab = 'graph'}
+			>
+				Graph
+			</button>
+			<button 
+				class="tab {activeTab === 'table' ? 'active' : ''}" 
+				on:click={() => activeTab = 'table'}
+			>
+				Table
+			</button>
+		</div>
+
+		{#if activeTab === 'graph'}
+			<Chart {contributions} />
+		{:else}
+			<div class="table-scroll-container overflow-x-auto">
+				<table class="table-auto w-full mt-4">
+					<thead>
+						<tr>
+							<th class="px-4 py-2">Year</th>
+							<th class="px-4 py-2">Contribution So Far</th>
+							<th class="px-4 py-2">Total So Far</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each contributions as contribution}
+							<tr>
+								<td class="border px-4 py-2">{contribution.yearNumber}</td>
+								<td class="border px-4 py-2">{formatCurrency(contribution.principalValue)}</td>
+								<td class="border px-4 py-2">{formatCurrency(contribution.total)}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/if}
 	  </div>
 	</div>
 </div>

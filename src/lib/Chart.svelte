@@ -25,23 +25,33 @@
             {
               label: 'Total Balance',
               data: contributions.map(contribution => contribution.total),
-              borderColor: 'green',
+              borderColor: 'white',
               fill: false,
+              pointStyle: 'line',
             },
             {
               label: 'Principal Value',
               data: contributions.map(contribution => contribution.principalValue),
-              borderColor: 'blue',
+              borderColor: 'red',
               fill: false,
+              pointStyle: 'line',
             }
           ]
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             title: {
               display: true,
               text: 'Total Balance Over Time'
+            },
+            legend: {
+              labels: {
+                usePointStyle: true,
+                boxWidth: 20,
+                boxHeight: 20,
+              }
             }
           },
           scales: {
@@ -82,5 +92,38 @@
     });
   </script>
   
-  <canvas bind:this={canvas}></canvas>
+  <div class="chart-container">
+    <canvas bind:this={canvas}></canvas>
+  </div>
+  
+  <style>
+.chart-container {
+  width: 100%;
+  /* min-height: 300px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+canvas {
+  width: 100% !important;
+  max-width: 100%;
+  height: 300px !important;
+  min-height: 200px;
+  display: block;
+  margin: 0 auto 1rem auto;
+}
+
+@media (max-width: 600px) {
+  .chart-container {
+    /* min-height: 350px; */
+    /* aspect-ratio: 1 / 1; */
+    max-width: 100vw;
+  }
+  canvas {
+    height: 350px !important;
+    min-height: 350px;
+  }
+}
+</style>
   
