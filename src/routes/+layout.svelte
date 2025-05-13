@@ -20,6 +20,9 @@
 	// Speed Insights
 	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 	injectSpeedInsights();
+
+	import analytics from '@vercel/analytics';
+	analytics.inject();
 </script>
 
 <!-- App Shell -->

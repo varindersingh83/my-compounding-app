@@ -45,6 +45,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.0.11",
     "chart.js": "^4.4.3",
     "highlight.js": "11.9.0",
