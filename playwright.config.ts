@@ -1,12 +1,21 @@
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
-	webServer: {
-		command: 'npm run build && npm run preview',
-		port: 4173
+export default defineConfig({
+	testDir: './tests',
+	testMatch: /.*\.spec\.ts/,
+	use: {
+		baseURL: 'http://127.0.0.1:4173',
+		trace: 'on-first-retry'
 	},
-	testDir: 'tests',
-	testMatch: /(.+\.)?(test|spec)\.[jt]s/
-};
-
-export default config;
+	webServer: {
+		command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 4173',
+		port: 4173,
+		reuseExistingServer: !process.env.CI
+	},
+	projects: [
+		{
+			name: 'chromium',
+			use: { ...devices['Desktop Chrome'] }
+		}
+	]
+});

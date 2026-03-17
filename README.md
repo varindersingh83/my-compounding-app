@@ -1,16 +1,40 @@
-# my-compounding-app
-Simple tool to see compounding 
+# Compound It
+
+Compound It is a modern React + Vite investment growth calculator that projects compound growth, total contributed principal, and inflation-adjusted present value.
+
+## Stack
+
+- React 19
+- Vite
+- TypeScript
+- Tailwind CSS
+- Recharts
+- Zod
+- Vitest + Testing Library
+- Playwright
 
 ## Running Locally
 
-To run the app locally, you'll need to:
-
-1. First install the dependencies (if you haven't already):
 ```bash
 npm install
-```
-
-2. Then start the development server:
-```bash
 npm run dev
 ```
+
+## Available Scripts
+
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run check
+npm run test:unit
+npm run test:integration
+npm test
+```
+
+## Product Notes
+
+- Inputs are annual values
+- Blank fields default to zero
+- Present value is discounted from the ending balance using the inflation rate
+- The chart compares total balance vs contributed principal
