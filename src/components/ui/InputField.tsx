@@ -1,6 +1,7 @@
 import { type ChangeEvent, type HTMLAttributes } from 'react';
 
 import { cn } from '../../lib/cn';
+import { formatDisplayValue, type NumericInputKind } from '../../lib/input';
 
 interface InputFieldProps {
 	id: string;
@@ -8,6 +9,7 @@ interface InputFieldProps {
 	description: string;
 	value: string;
 	onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+	formatKind?: NumericInputKind;
 	inputMode: HTMLAttributes<HTMLInputElement>['inputMode'];
 	placeholder: string;
 	suffix?: string;
@@ -19,10 +21,13 @@ export function InputField({
 	description,
 	value,
 	onChange,
+	formatKind,
 	inputMode,
 	placeholder,
 	suffix
 }: InputFieldProps) {
+	const displayValue = formatKind ? formatDisplayValue(value, formatKind) : value;
+
 	return (
 		<div className="space-y-2">
 			<label htmlFor={id} className="block text-sm font-semibold text-ink">
@@ -31,7 +36,7 @@ export function InputField({
 			<div className="relative">
 				<input
 					id={id}
-					value={value}
+					value={displayValue}
 					onChange={onChange}
 					inputMode={inputMode}
 					placeholder={placeholder}

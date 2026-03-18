@@ -28,6 +28,7 @@ export function CalculatorForm({ inputs, onChange }: CalculatorFormProps) {
 				description="Your starting balance before any future contributions."
 				value={inputs.initialDeposit}
 				onChange={updateField('initialDeposit', 'currency')}
+				formatKind="currency"
 				inputMode="decimal"
 				placeholder="$25,000"
 			/>
@@ -37,6 +38,7 @@ export function CalculatorForm({ inputs, onChange }: CalculatorFormProps) {
 				description="How much you add each year."
 				value={inputs.annualContribution}
 				onChange={updateField('annualContribution', 'currency')}
+				formatKind="currency"
 				inputMode="decimal"
 				placeholder="$10,000"
 			/>
@@ -46,6 +48,7 @@ export function CalculatorForm({ inputs, onChange }: CalculatorFormProps) {
 				description="How much you plan to withdraw each year once withdrawals begin."
 				value={inputs.annualWithdrawal}
 				onChange={updateField('annualWithdrawal', 'currency')}
+				formatKind="currency"
 				inputMode="decimal"
 				placeholder="$100,000"
 			/>
@@ -55,6 +58,7 @@ export function CalculatorForm({ inputs, onChange }: CalculatorFormProps) {
 				description="The first year when the annual withdrawal is taken before growth is applied."
 				value={inputs.withdrawalStartYear}
 				onChange={updateField('withdrawalStartYear', 'integer')}
+				formatKind="integer"
 				inputMode="numeric"
 				placeholder="30"
 			/>
@@ -64,6 +68,7 @@ export function CalculatorForm({ inputs, onChange }: CalculatorFormProps) {
 				description="Used to convert the ending balance into today&apos;s dollars."
 				value={inputs.inflationRate}
 				onChange={updateField('inflationRate', 'rate')}
+				formatKind="rate"
 				inputMode="decimal"
 				placeholder="3.0"
 				suffix="%"
@@ -74,6 +79,7 @@ export function CalculatorForm({ inputs, onChange }: CalculatorFormProps) {
 				description="Whole years only in this version."
 				value={inputs.years}
 				onChange={updateField('years', 'integer')}
+				formatKind="integer"
 				inputMode="numeric"
 				placeholder="20"
 			/>
@@ -83,6 +89,7 @@ export function CalculatorForm({ inputs, onChange }: CalculatorFormProps) {
 				description="Expected annual return before inflation."
 				value={inputs.returnRate}
 				onChange={updateField('returnRate', 'rate')}
+				formatKind="rate"
 				inputMode="decimal"
 				placeholder="8.0"
 				suffix="%"
