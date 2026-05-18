@@ -1,0 +1,12 @@
+- generic [ref=e3]:
+  - generic [ref=e4]: "[plugin:vite:css] Failed to load PostCSS config (searchPath: /Users/varindernagra/Documents/GitHub/compund-it): [Error] Loading PostCSS Plugin failed: Cannot read properties of undefined (reading 'space') (@/Users/varindernagra/Documents/GitHub/compund-it/postcss.config.js) Error: Loading PostCSS Plugin failed: Cannot read properties of undefined (reading 'space') (@/Users/varindernagra/Documents/GitHub/compund-it/postcss.config.js) at load (file:///Users/varindernagra/Documents/GitHub/compund-it/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:11776:11) at async Promise.all (index 0) at async plugins (file:///Users/varindernagra/Documents/GitHub/compund-it/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:11805:12) at async processResult (file:///Users/varindernagra/Documents/GitHub/compund-it/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:11876:14)"
+  - generic [ref=e5]: /Users/varindernagra/Documents/GitHub/compund-it/src/styles.css
+  - generic [ref=e6]:
+    - text: Click outside, press Esc key, or fix the code to dismiss.
+    - text: You can also disable this overlay by setting
+    - code [ref=e7]: server.hmr.overlay
+    - text: to
+    - code [ref=e8]: "false"
+    - text: in
+    - code [ref=e9]: vite.config.ts
+    - text: .
