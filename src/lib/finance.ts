@@ -15,6 +15,15 @@ export interface CalculationResult {
 	series: YearlyResult[];
 }
 
+export interface WithdrawalImpact {
+	baselineTotal: number;
+	plannedTotal: number;
+	plannedReduction: number;
+	plannedReductionPercent: number;
+	suggestedStartYear: number | null;
+	thresholdPercent: number;
+}
+
 export function calculatePresentValue(
 	futureValue: number,
 	inflationRatePercent: number,
@@ -84,6 +93,68 @@ export function calculateCompoundGrowth(inputs: CalculatorInputs): CalculationRe
 		total,
 		presentValue,
 		series
+	};
+}
+
+export function calculateWithdrawalImpact(
+	inputs: CalculatorInputs,
+	thresholdPercent = 5
+): WithdrawalImpact | null {
+	const annualWithdrawal = Math.max(
+		0,
+		parseCalculatorInput(inputs.annualWithdrawal, 'currency')
+	);
+	const years = Math.max(0, parseCalculatorInput(inputs.years, 'integer'));
+
+	if (annualWithdrawal <= 0 || years <= 0) return null;
+
+	const baselineInputs: CalculatorInputs = {
+		...inputs,
+		annualWithdrawal: '',
+		withdrawalStartYear: ''
+	};
+	const baselineTotal = calculateCompoundGrowth(baselineInputs).total;
+
+	if (baselineTotal <= 0) return null;
+
+	const reductionForStartYear = (startYear: number) => {
+		const result = calculateCompoundGrowth({
+			...inputs,
+			withdrawalStartYear: String(startYear)
+		});
+		const reduction = Math.max(0, baselineTotal - result.total);
+
+		return {
+			total: result.total,
+			reduction,
+			reductionPercent: (reduction / baselineTotal) * 100
+		};
+	};
+
+	let suggestedStartYear: number | null = null;
+	for (let startYear = 1; startYear <= years; startYear += 1) {
+		if (reductionForStartYear(startYear).reductionPercent <= thresholdPercent) {
+			suggestedStartYear = startYear;
+			break;
+		}
+	}
+
+	const configuredStartYear = Math.max(
+		0,
+		parseCalculatorInput(inputs.withdrawalStartYear, 'integer')
+	);
+	const planned =
+		configuredStartYear > 0
+			? reductionForStartYear(configuredStartYear)
+			: { total: baselineTotal, reduction: 0, reductionPercent: 0 };
+
+	return {
+		baselineTotal,
+		plannedTotal: planned.total,
+		plannedReduction: planned.reduction,
+		plannedReductionPercent: planned.reductionPercent,
+		suggestedStartYear,
+		thresholdPercent
 	};
 }
 

@@ -9,7 +9,7 @@ interface ResultsSummaryProps {
 export function ResultsSummary({ results, hasMeaningfulData }: ResultsSummaryProps) {
 	const items = [
 		{
-			label: 'Contribution amount',
+			label: 'Contributed',
 			value: formatCurrencyCompact(results.contributionAmount),
 			exactValue: formatCurrency(results.contributionAmount),
 			accent: 'text-sky'
@@ -29,28 +29,23 @@ export function ResultsSummary({ results, hasMeaningfulData }: ResultsSummaryPro
 	];
 
 	return (
-		<div className="grid gap-4 md:grid-cols-3">
+		<div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-white/80 bg-white/90 shadow-panel backdrop-blur">
 			{items.map((item) => (
 				<div
 					key={item.label}
-					className="overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/90 p-5 shadow-panel backdrop-blur md:p-6"
+					className="min-w-0 border-r border-ink/10 px-3 py-3 last:border-r-0 sm:px-5 sm:py-4"
 				>
-					<p className="text-sm uppercase tracking-[0.18em] text-slate">{item.label}</p>
+					<p className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-slate sm:text-xs">
+						{item.label}
+					</p>
 					<p
-						className={`mt-4 break-words font-display text-[clamp(1.9rem,4vw,2.6rem)] font-semibold leading-none ${item.accent}`}
+						className={`mt-1 truncate font-display text-lg font-semibold leading-tight sm:mt-2 sm:text-2xl ${item.accent}`}
 						title={hasMeaningfulData ? item.exactValue : '$0'}
 					>
 						{hasMeaningfulData ? item.value : '$0'}
 					</p>
-					<p className="mt-2 text-xs font-medium uppercase tracking-[0.12em] text-slate/75">
+					<p className="mt-0.5 hidden truncate text-xs text-slate/75 sm:block">
 						{hasMeaningfulData ? item.exactValue : 'Exact: $0'}
-					</p>
-					<p className="mt-3 text-sm leading-6 text-slate">
-						{item.label === 'Present value'
-							? 'Inflation-adjusted estimate of your ending balance.'
-							: item.label === 'Total'
-								? 'Projected ending balance after contributions and growth.'
-								: 'Total capital added from your initial investment and annual contributions.'}
 					</p>
 				</div>
 			))}

@@ -1,8 +1,29 @@
 import type { ChangeEvent } from 'react';
 
 import type { CalculatorInputs } from '../lib/input';
-import { formatDisplayValue, sanitizeNumericInput } from '../lib/input';
+import { sanitizeNumericInput } from '../lib/input';
 import { InputField } from './ui/InputField';
+
+const returnPresets = [
+	{
+		label: 'S&P 500',
+		value: '10',
+		displayValue: '10.0%',
+		period: 'Since 1957'
+	},
+	{
+		label: 'Nasdaq-100',
+		value: '14.60',
+		displayValue: '14.60%',
+		period: 'Since Feb 1985'
+	},
+	{
+		label: 'TQQQ',
+		value: '44.36',
+		displayValue: '44.36%',
+		period: 'Since Feb 2010'
+	}
+] as const;
 
 interface CalculatorFormProps {
 	inputs: CalculatorInputs;
@@ -20,8 +41,15 @@ export function CalculatorForm({ inputs, onChange }: CalculatorFormProps) {
 			});
 		};
 
+	const applyReturnPreset = (value: string) => {
+		onChange({
+			...inputs,
+			returnRate: value
+		});
+	};
+
 	return (
-		<form className="space-y-4" aria-label="Investment calculator">
+		<form className="space-y-1" aria-label="Investment calculator">
 			<InputField
 				id="initial-deposit"
 				label="Initial deposit"
@@ -41,26 +69,6 @@ export function CalculatorForm({ inputs, onChange }: CalculatorFormProps) {
 				formatKind="currency"
 				inputMode="decimal"
 				placeholder="$10,000"
-			/>
-			<InputField
-				id="annual-withdrawal"
-				label="Annual withdrawal"
-				description="How much you plan to withdraw each year once withdrawals begin."
-				value={inputs.annualWithdrawal}
-				onChange={updateField('annualWithdrawal', 'currency')}
-				formatKind="currency"
-				inputMode="decimal"
-				placeholder="$100,000"
-			/>
-			<InputField
-				id="withdrawal-start-year"
-				label="Withdrawal start year"
-				description="The first year when the annual withdrawal is taken before growth is applied."
-				value={inputs.withdrawalStartYear}
-				onChange={updateField('withdrawalStartYear', 'integer')}
-				formatKind="integer"
-				inputMode="numeric"
-				placeholder="30"
 			/>
 			<InputField
 				id="inflation-rate"
@@ -95,27 +103,43 @@ export function CalculatorForm({ inputs, onChange }: CalculatorFormProps) {
 				suffix="%"
 			/>
 
-			<div className="rounded-2xl border border-ink/10 bg-linen/70 p-4">
-				<p className="text-xs uppercase tracking-[0.18em] text-slate">Quick example</p>
-				<p className="mt-2 text-sm leading-6 text-ink/80">
-					{formatDisplayValue('5000', 'currency')} initial deposit,
-					{` ${formatDisplayValue('1200', 'currency')} `}
-					annual contribution, {formatDisplayValue('0', 'currency')} withdrawal, 10
-					years, 8% return, 3% inflation.
-				</p>
-				<div className="mt-4 rounded-2xl border border-ink/10 bg-white/75 px-4 py-3">
-					<p className="text-xs uppercase tracking-[0.18em] text-slate">
-						Rate of Return Since Inception
-					</p>
-					<p className="mt-2 text-sm font-medium leading-6 text-ink">
-						S&amp;P 500: 9.97% | Nasdaq: 17.91% | TQQQ: 41.04%
-					</p>
-					<p className="mt-2 text-xs leading-5 text-slate">
-						With TQQQ&apos;s annualized return since inception on February 9, 2010,
-						ProShares reports 41.04% annualized at NAV as of February 28, 2026.
-					</p>
+			<fieldset className="pt-3">
+				<legend className="px-1 text-xs font-semibold text-ink">Historical total return presets</legend>
+				<div className="mt-2 grid grid-cols-3 gap-2">
+					{returnPresets.map((preset) => {
+						const isSelected = Number(inputs.returnRate) === Number(preset.value);
+
+						return (
+							<button
+								key={preset.label}
+								type="button"
+								aria-pressed={isSelected}
+								aria-label={`Use ${preset.label} historical return of ${preset.displayValue}`}
+								onClick={() => applyReturnPreset(preset.value)}
+								className={`min-w-0 rounded-xl border px-2 py-2.5 text-center transition focus:outline-none focus:ring-4 focus:ring-sky/15 active:scale-[0.98] ${
+									isSelected
+										? 'border-ink bg-ink text-white shadow-soft'
+										: 'border-ink/15 bg-linen/70 text-ink hover:border-sky hover:bg-white'
+								}`}
+							>
+								<span className="block truncate text-[11px] font-semibold">{preset.label}</span>
+								<span className="mt-0.5 block text-sm font-bold">{preset.displayValue}</span>
+								<span className={`mt-1 block truncate text-[9px] ${isSelected ? 'text-white/70' : 'text-slate'}`}>
+									{preset.period}
+								</span>
+							</button>
+						);
+					})}
 				</div>
-			</div>
+				<p className="px-1 pt-2 text-[10px] leading-4 text-slate">
+					Returns include reinvested distributions. TQQQ targets 3× the Nasdaq-100&apos;s daily return,
+					so its long-term result can differ sharply from 3× the index.
+				</p>
+			</fieldset>
+
+			<p className="px-1 pt-3 text-xs leading-5 text-slate">
+				Annual contributions are added before growth. Add a withdrawal scenario after building the base projection.
+			</p>
 		</form>
 	);
 }

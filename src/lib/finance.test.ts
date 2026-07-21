@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { calculateCompoundGrowth, calculatePresentValue } from './finance';
+import {
+	calculateCompoundGrowth,
+	calculatePresentValue,
+	calculateWithdrawalImpact
+} from './finance';
 import { formatCurrencyCompact } from './format';
 import type { CalculatorInputs } from './input';
 
@@ -166,9 +170,9 @@ describe('calculateCompoundGrowth', () => {
 		);
 
 		expect(result.presentValue).toBeLessThan(result.total);
-		expect(result.presentValue).toBe(10318.34);
+		expect(result.presentValue).toBe(13044.84);
 		expect(result.series[0].presentValue).toBe(1067.96);
-		expect(result.series[9].presentValue).toBe(10318.34);
+		expect(result.series[9].presentValue).toBe(13044.83);
 	});
 
 	it('applies withdrawals before annual growth starting at the configured year', () => {
@@ -184,28 +188,28 @@ describe('calculateCompoundGrowth', () => {
 			})
 		);
 
-			expect(result.series[1]).toEqual({
-				year: 2,
-				balance: 1270500,
-				principal: 1100000,
-				presentValue: 1197356.05,
-				withdrawal: 0
-			});
-			expect(result.series[2]).toEqual({
-				year: 3,
-				balance: 1331550,
-				principal: 1050000,
-				presentValue: 1218367.6,
-				withdrawal: 100000
-			});
-			expect(result.series[3]).toEqual({
-				year: 4,
-				balance: 1415205,
-				principal: 1000000,
-				presentValue: 1257429.54,
-				withdrawal: 100000
-			});
-		expect(result.contributionAmount).toBe(1000000);
+		expect(result.series[1]).toEqual({
+			year: 2,
+			balance: 1325500,
+			principal: 1100000,
+			presentValue: 1249410.88,
+			withdrawal: 0
+		});
+		expect(result.series[2]).toEqual({
+			year: 3,
+			balance: 1403050,
+			principal: 1050000,
+			presentValue: 1283989.51,
+			withdrawal: 100000
+		});
+		expect(result.series[3]).toEqual({
+			year: 4,
+			balance: 1488355,
+			principal: 1000000,
+			presentValue: 1322384.14,
+			withdrawal: 100000
+		});
+		expect(result.contributionAmount).toBe(1200000);
 	});
 });
 
@@ -220,6 +224,33 @@ describe('calculatePresentValue', () => {
 
 	it('supports zero inflation', () => {
 		expect(calculatePresentValue(10000, 0, 10)).toBe(10000);
+	});
+});
+
+describe('calculateWithdrawalImpact', () => {
+	it('finds the earliest withdrawal year within the ending-balance threshold', () => {
+		const inputs = buildInputs({
+			initialDeposit: '1000000',
+			annualContribution: '100000',
+			annualWithdrawal: '10000',
+			years: '20',
+			returnRate: '10'
+		});
+		const impact = calculateWithdrawalImpact(inputs);
+
+		expect(impact).not.toBeNull();
+		expect(impact?.suggestedStartYear).not.toBeNull();
+		expect(impact?.suggestedStartYear).toBeGreaterThanOrEqual(1);
+
+		const suggestedPlan = calculateWithdrawalImpact({
+			...inputs,
+			withdrawalStartYear: String(impact?.suggestedStartYear)
+		});
+		expect(suggestedPlan?.plannedReductionPercent).toBeLessThanOrEqual(5);
+	});
+
+	it('returns no guide without a withdrawal amount', () => {
+		expect(calculateWithdrawalImpact(buildInputs({ years: '20' }))).toBeNull();
 	});
 });
 

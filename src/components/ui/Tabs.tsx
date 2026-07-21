@@ -9,7 +9,7 @@ interface TabsProps {
 export function Tabs({ value, onValueChange, options }: TabsProps) {
 	return (
 		<div
-			className="inline-flex rounded-full border border-ink/10 bg-linen/80 p-1"
+			className="inline-flex shrink-0 rounded-xl border border-ink/10 bg-linen/80 p-1"
 			role="tablist"
 			aria-label="Results view"
 		>
@@ -23,7 +23,7 @@ export function Tabs({ value, onValueChange, options }: TabsProps) {
 						aria-selected={isActive}
 						onClick={() => onValueChange(option.value)}
 						className={cn(
-							'rounded-full px-4 py-2 text-sm font-medium transition',
+							'rounded-lg px-3 py-2 text-sm font-semibold transition sm:px-4',
 							isActive
 								? 'bg-ink text-white shadow-soft'
 								: 'text-slate hover:text-ink'

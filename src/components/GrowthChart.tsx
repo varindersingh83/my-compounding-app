@@ -15,6 +15,7 @@ import { formatCurrency, formatCurrencyCompact } from '../lib/format';
 
 interface GrowthChartProps {
 	series: YearlyResult[];
+	withdrawalSeries?: YearlyResult[];
 	hasMeaningfulData: boolean;
 }
 
@@ -41,10 +42,10 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
 	);
 }
 
-export function GrowthChart({ series, hasMeaningfulData }: GrowthChartProps) {
+export function GrowthChart({ series, withdrawalSeries, hasMeaningfulData }: GrowthChartProps) {
 	if (!hasMeaningfulData) {
 		return (
-			<div className="flex h-[360px] items-center justify-center rounded-[1.5rem] border border-dashed border-ink/15 bg-linen/60 text-center">
+			<div className="flex h-[min(58dvh,34rem)] min-h-[22rem] items-center justify-center rounded-xl border border-dashed border-ink/15 bg-linen/60 text-center">
 				<div className="max-w-sm px-6">
 					<p className="font-display text-2xl font-semibold text-ink">No growth data yet</p>
 					<p className="mt-3 text-sm leading-6 text-slate">
@@ -55,10 +56,15 @@ export function GrowthChart({ series, hasMeaningfulData }: GrowthChartProps) {
 		);
 	}
 
+	const chartData = series.map((row, index) => ({
+		...row,
+		withdrawalBalance: withdrawalSeries?.[index]?.balance
+	}));
+
 	return (
-		<div className="h-[360px] rounded-[1.5rem] bg-linen/55 p-3 sm:h-[420px]">
+		<div className="h-[min(58dvh,34rem)] min-h-[22rem] rounded-xl bg-linen/55 py-3 pr-1 sm:p-3">
 			<ResponsiveContainer width="100%" height="100%">
-				<LineChart data={series} margin={{ left: 4, right: 20, top: 12, bottom: 0 }}>
+				<LineChart data={chartData} margin={{ left: -8, right: 8, top: 12, bottom: 0 }}>
 					<CartesianGrid stroke="rgba(16,42,67,0.10)" strokeDasharray="4 6" />
 					<XAxis
 						dataKey="year"
@@ -72,7 +78,7 @@ export function GrowthChart({ series, hasMeaningfulData }: GrowthChartProps) {
 						tickLine={false}
 						axisLine={false}
 						tickFormatter={(value) => formatCurrencyCompact(Number(value))}
-						width={88}
+						width={68}
 					/>
 					<Tooltip content={<CustomTooltip />} />
 					<Legend />
@@ -94,6 +100,17 @@ export function GrowthChart({ series, hasMeaningfulData }: GrowthChartProps) {
 						strokeDasharray="6 6"
 						dot={false}
 					/>
+					{withdrawalSeries ? (
+						<Line
+							type="monotone"
+							dataKey="withdrawalBalance"
+							name="After withdrawals"
+							stroke="#2563eb"
+							strokeWidth={3}
+							dot={false}
+							activeDot={{ r: 5 }}
+						/>
+					) : null}
 				</LineChart>
 			</ResponsiveContainer>
 		</div>
